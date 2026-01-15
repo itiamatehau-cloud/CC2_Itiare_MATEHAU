@@ -1,158 +1,132 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>CC2_Itiare_MATEHAU</title>
-    <style>
-        /* Styles Généraux basés sur les captures d'écran */
-        body {
-            font-family: "Times New Roman", Times, serif;
-            font-size: 12pt;
-            line-height: 1.6;
-            color: #333;
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 40px;
-            background-color: #ffffff;
-        }
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
-        /* Titres ALIGNÉS À GAUCHE comme demandé */
-        h1, .section-title, h2, h3 {
-            text-align: left;
-            font-weight: bold;
-            color: #000;
-            margin-top: 30px;
-            margin-bottom: 15px;
-            display: block;
-        }
+<title>CC2_Itiare_MATEHAU</title>
 
-        h1 { font-size: 2.2em; border-bottom: 1px solid #ccc; padding-bottom: 10px; }
-        .section-title { font-size: 1.4em; text-decoration: underline; }
+<style type="text/css">
+  body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
+  }
+  h1 { border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 40px; }
+  h2 { border-bottom: 1px solid #eee; padding-bottom: 5px; margin-top: 30px; }
+  h3 { margin-top: 25px; color: #444; }
+  code {
+    background-color: #f5f5f5;
+    padding: 2px 4px;
+    border-radius: 4px;
+    font-family: monospace;
+  }
+  pre {
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+    padding: 15px;
+    overflow-x: auto;
+    border-radius: 5px;
+  }
+  img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 20px auto;
+    border: 1px solid #ddd;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+  }
+  .header {
+    text-align: center;
+    border-bottom: 3px solid #333;
+    margin-bottom: 40px;
+  }
+  .date { color: #666; font-style: italic; }
+</style>
 
-        /* TEXTE CENTRÉ comme sur la capture d'écran */
-        p, .metadata {
-            text-align: center;
-            margin-bottom: 20px;
-            width: 90%;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        /* Blocs de Code (Encadré gris, aligné à gauche pour la lecture) */
-        pre {
-            background-color: #f4f4f4;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 15px;
-            text-align: left;
-            overflow-x: auto;
-            margin: 20px auto;
-            display: block;
-            width: 95%;
-        }
-
-        code {
-            font-family: "Courier New", Courier, monospace;
-            color: #2c3e50;
-        }
-
-        /* Commentaires en vert dans le code */
-        .comment {
-            color: #008000;
-            font-style: italic;
-        }
-
-        /* Images centrées */
-        img {
-            max-width: 100%;
-            height: auto;
-            margin: 20px auto;
-            display: block;
-            border: 1px solid #eee;
-        }
-
-        hr {
-            border: 0;
-            border-top: 1px solid #ccc;
-            margin: 30px 0;
-        }
-
-        .metadata {
-            font-style: italic;
-            border: 1px solid #eee;
-            padding: 10px;
-            background: #fafafa;
-        }
-    </style>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
+
 <body>
 
-<h1>CC2_Itiare_MATEHAU</h1>
-
-<div class="metadata">
-    title: “Analyse_(Oh et al., 2023)”<br>
-    output: pdf_document, html_document<br>
-    date: “2026-01-12”
+<div class="header">
+  <h1 class="title">CC2_Itiare_MATEHAU</h1>
+  <p class="author">Analyse (Oh et al., 2023)</p>
+  <p class="date">2026-01-12</p>
 </div>
 
-<hr>
+<div id="introduction" class="section level1">
+  <h1>INTRODUCTION</h1>
+  <p>Cette étude, intitulée <strong>"Metagenomic characterization of the microbiomes in five different body habitats of otherwise healthy individuals with periodontal disease"</strong>, a été publiée le 13 septembre 2023 dans la revue <em>Frontiers in Cellular and Infection Microbiology</em>. Les auteurs principaux sont Sujin Oh, Hyo-Jung Lee et Kyoung Un Park, issus de l'Université Nationale de Séoul.</p>
+  <p>Il porte sur la caractérisation des profils microbiens (taxonomiques et fonctionnels) dans cinq habitats corporels différents chez des individus atteints de maladie parodontale mais par ailleurs en bonne santé. Cette recherche vise à étudier le microbiome buccal, du sang et du tube digestif et à comprendre comment leur altération peut contribuer à des maladies parodontales comme des maladies cardio-vasculaires, l’Alzheimer et le cancer, avant même l’apparition des premiers symptômes cliniques.</p>
+  <p>Dans l’analyse effectuée avec le pipeline <strong>DADA2</strong>, l’objectif est de comparer la structure et la signature taxonomique des microbiomes systémiques.</p>
+</div>
 
-<span class="section-title">#INTRODUCTION</span>
-<p>
-    Cette étude, intitulée "Metagenomic characterization of the microbiomes in five different body habitats of otherwise healthy individuals with periodontal disease", a été publiée le 13 septembre 2023 dans la revue Frontiers in Cellular and Infection Microbiology. Les auteurs principaux sont Sujin Oh, Hyo-Jung Lee et Kyoung Un Park, issus de l’Université Nationale de Séoul.<br><br>
-    Il porte sur la caractérisation des profils microbiens (taxonomiques et fonctionnels) dans cinq habitats corporels différents chez des individus atteints de maladie parodontale mais par ailleurs en bonne santé. Cette recherche vise à étudier le microbiome buccal, du sang et du tube digestif et à comprendre comment leur altération peut contribuer à des maladies parodontales comme des maladies cardio-vasculaires, l’Alzheimer et du cancer, avant même l’apparition des premiers symptômes cliniques.<br><br>
-    Dans l’analyse effectuée avec le pipeline DADA2, l’objectif est de comparer la structure et la signature taxonomique des microbiomes systémiques.
-</p>
+<div id="materiels-et-methodes" class="section level1">
+  <h1>MATERIELS ET METHODES</h1>
+  <p>L'étude porte sur un échantillon de 10 adultes présentant une maladie parodontale. Des prélèvements ont été effectués dans cinq sites distincts : le sang, la muqueuse buccale, la plaque dentaire, la salive ainsi que les selles. La méthode principale repose sur le séquençage du gène ARNr 16S via la plateforme MiSeq. L'analyse bioinformatique a utilisé <strong>QIIME2</strong> pour la diversité et <strong>ANCOM-BC</strong> pour l'abondance différentielle.</p>
 
-<span class="section-title">#MATERIELS ET METHODES</span>
-<p>
-    L’étude porte sur un échantillon de 10 adultes présentant une maladie parodontale. Des prélèvements ont été effectués dans cinq sites distincts, au niveau du sang, de la muqueuse buccale, de la plaque dentaire, de la salive ainsi que des selles. La méthode principale repose sur le séquençage du gène ARNr 16S via la plateforme MiSeq.
-</p>
+  <h2>DADA2</h2>
+  <p>Pour analyser les données brutes de séquençage de cet article, les auteurs ont utilisé le pipeline DADA2. Contrairement aux méthodes traditionnelles basées sur les OTU (Unités Taxonomiques Opérationnelles), DADA2 permet de modéliser les erreurs de séquençage pour corriger les lectures et produire des ASV (Amplicons Sequence Variants). Le processus inclut le filtrage de qualité, la déduplication, la fusion des lectures "paired-end" et la suppression des chimères.</p>
 
-<span class="section-title">DADA2 - TRAITEMENT DES DONNÉES</span>
-<p>
-    Pour analyser les données brutes de séquençage, le pipeline DADA2 est utilisé pour modéliser les erreurs et produire des ASV (Amplicons Sequence Variants).
-</p>
+  <h3>1-PREPARATION</h3>
+  <pre><code>library(dada2); packageVersion("dada2")
+# [1] ‘1.28.0’</code></pre>
 
-<pre><code><span class="comment"># Définition du chemin et vérification des fichiers</span>
-path <- "~/Article_ADM" 
-list.files(path)</code></pre>
+  <pre><code>path <- "~/Article_ADM" 
+list.files(path)
+# [1] "ena-file-download-read_run-PRJNA489752-fastq_ftp-20260112-1450.sh"
+# [2] "SraRunTable.csv"</code></pre>
 
-<span class="section-title">1- QUALITÉ ET FILTRAGE</span>
-<p>
-    L'inspection des profils de qualité est cruciale avant le filtrage pour déterminer les paramètres de troncature.
-</p>
+  <h3>2-INSPECTER LES PROFILS DE QUALITÉ</h3>
+  <p>Les profils Forward révèlent un séquençage de haute qualité (Q>30), malgré une baisse de la précision en fin de lecture au-delà de 230 pb.</p>
+  <img src="./000010.png" alt="Qualité Forward">
+  <img src="./000010%20(1).png" alt="Qualité Reverse">
 
-<pre><code><span class="comment"># Filtrage et rognage des séquences</span>
-out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs, truncLen=c(240,160),
+  <h3>3-FILTRER ET DECOUPER</h3>
+  <pre><code>out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs, truncLen=c(240,160),
                      maxN=0, maxEE=c(2,2), truncQ=2, rm.phix=TRUE,
-                     compress=TRUE, multithread=FALSE)</code></pre>
+                     compress=TRUE, multithread=FALSE)
+head(out)</code></pre>
 
-<img src="./000010.png" alt="Qualité Forward">
+  <h3>8-SUPPRESSION DES CHIMÈRES</h3>
+  <p>Identified 521 bimeras out of 1215 input sequences. Après suppression, il reste 694 séquences.</p>
+</div>
 
-<span class="section-title">2- SUIVI DU PIPELINE (TRACKING)</span>
-<p>
-    Le suivi permet de vérifier le nombre de lectures conservées à chaque étape (filtrage, débruitage, fusion, chimères).
-</p>
+<div id="resultats" class="section level1">
+  <h1>RESULTATS</h1>
+  <h3>Alpha Diversité (Indice de Shannon)</h3>
+  <img src="./000012.png" alt="Shannon Index">
+  <p>L'analyse révèle que le microbiome sanguin présente les niveaux de richesse les plus élevés. Ces résultats démontrent que le sang héberge une communauté bactérienne plus diversifiée que les niches comme l'intestin chez ces patients.</p>
 
-<pre><code><span class="comment"># Création du tableau de suivi</span>
-track <- cbind(out, sapply(dadaFs, getN), sapply(dadaRs, getN), 
-               sapply(mergers, getN), rowSums(seqtab.nochim))</code></pre>
+  <h3>Bêta Diversité (PCoA)</h3>
+  <img src="./000019.png" alt="Beta Diversité">
+  <p>L'analyse de Bray-Curtis révèle deux regroupements distincts : le microbiome du sang forme un groupe isolé, tandis que les échantillons buccaux se regroupent par similitude écologique.</p>
 
-<span class="section-title">3- TAXONOMIE ET RÉSULTATS</span>
-<p>
-    L’assignation taxonomique utilise la base de données SILVA pour identifier les genres bactériens.
-</p>
+  <h3>Composition Taxonomique (Phylum)</h3>
+  <img src="./000010%20(3).png" alt="Taxonomie">
+  <p>Le microbiome sanguin est dominé par les <strong>Pseudomonadota</strong>, tandis que les selles sont dominées par les <strong>Bacteroidota</strong> et les <strong>Bacillota</strong>.</p>
+</div>
 
-<pre><code><span class="comment"># Assignation taxonomique avec SILVA v138</span>
-taxa <- assignTaxonomy(seqtab.nochim, "silva_nr99_v138.2_toGenus_trainset.fa.gz")</code></pre>
+<div id="discussion" class="section level1">
+  <h1>DISCUSSION</h1>
+  <p>En comparant nos analyses DADA2/Phyloseq avec l'article original, on observe une cohérence forte. L'indice de Shannon confirme la haute diversité sanguine. La séparation nette en PCoA prouve que chaque zone du corps impose ses propres règles environnementales aux bactéries.</p>
+</div>
 
-<img src="./000010%20(3).png" alt="Taxonomie">
+<div id="conclusion" class="section level1">
+  <h1>CONCLUSION</h1>
+  <p>Cette étude a permis de confronter les profils microbiens de cinq habitats corporels. Le corps humain ne constitue pas un environnement uniforme, mais un archipel de niches écologiques hautement spécialisées.</p>
+</div>
 
-<span class="section-title">CONCLUSION</span>
-<p>
-    En conclusion, cette étude démontre que le corps humain n'est pas un environnement uniforme, mais un ensemble de niches écologiques spécialisées. Le microbiome sanguin s'avère être un indicateur précieux de l'état de santé systémique.
-</p>
+<script>
+$(document).ready(function () {
+  // Script pour la gestion dynamique si nécessaire (identique à votre modèle)
+});
+</script>
 
 </body>
 </html>
