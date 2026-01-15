@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>CC2_Itiare_MATEHAU</title>
+    <style>
+        /* Styles Généraux */
+        body {
+            font-family: "Times New Roman", Times, serif;
+            font-size: 12pt;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px;
+            text-align: center; /* Centrage de tout le texte */
+            background-color: #ffffff;
+        }
+
+        /* Titres */
+        h1 {
+            font-size: 2.2em;
+            margin-bottom: 0.2em;
+            color: #000;
+        }
+
+        /* Sections en gras et plus grandes */
+        .section-title {
+            font-weight: bold;
+            font-size: 1.4em;
+            margin-top: 30px;
+            display: block;
+            text-decoration: underline;
+        }
+
+        /* Blocs de Code */
+        pre {
+            background-color: #f4f4f4; /* Encadré gris */
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            text-align: left; /* Le code reste à gauche pour la lecture */
+            overflow-x: auto;
+            margin: 20px auto;
+            display: block;
+            width: 90%;
+        }
+
+        code {
+            font-family: "Courier New", Courier, monospace;
+            color: #2c3e50;
+        }
+
+        /* Commentaires en vert */
+        .comment {
+            color: #008000;
+            font-style: italic;
+        }
+
+        /* Images centrées */
+        img {
+            max-width: 100%;
+            height: auto;
+            margin: 20px auto;
+            display: block;
+            border: 1px solid #eee;
+        }
+
+        hr {
+            border: 0;
+            border-top: 1px solid #ccc;
+            margin: 30px 0;
+        }
+
+        .metadata {
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>CC2_Itiare_MATEHAU</h1>
+<hr>
+
+<div class="metadata">
+    title: “Analyse_(Oh et al., 2023)”<br>
+    output: pdf_document, html_document<br>
+    date: “2026-01-12”
+</div>
+
+<hr>
+
+<span class="section-title">INTRODUCTION</span>
+<p>
+    Cette étude, intitulée “Metagenomic characterization of the microbiomes in five different body habitats of otherwise healthy individuals with periodontal disease”, a été publiée le 13 septembre 2023 dans la revue Frontiers in Cellular and Infection Microbiology. Les auteurs principaux sont Sujin Oh, Hyo-Jung Lee et Kyoung Un Park, issus de l’Université Nationale de Séoul.<br>
+    Il porte sur la caractérisation des profils microbiens (taxonomiques et fonctionnels) dans cinq habitats corporels différents chez des individus atteints de maladie parodontale mais par ailleurs en bonne santé. Cette recherche vise à étudier le microbiome buccal, du sang et du tube digestif et à comprendre comment leur altération peut contribuer à des maladies parodontales comme des maladies cardio-vasculaires, l’Alzheimer et du cancer, avant même l’apparition des premiers symptômes cliniques.<br>
+    Dans l’analyse effectuée avec le pipeline DADA2, l’objectif est de comparer la structure et la signature taxonomique des microbiomes systémiques.
+</p>
+
+<span class="section-title">MATERIELS ET METHODES</span>
+<p>
+    L’étude porte sur un échantillon de 10 adultes présentant une maladie parodontale. Des prélèvements ont été effectués dans cinq sites distincts, au niveau du sang, de la muqueuse buccale, de la plaque dentaire, de la salive ainsi que des selles. La méthode principale repose sur le séquençage du gène ARNr 16S via la plateforme MiSeq. L’analyse bioinformatique a utilisé QIIME2 pour la diversité et ANCOM-BC pour l’abondance différentielle.
+</p>
+
+<span class="section-title">DADA2</span>
+<p>
+    Pour analyser les données brutes de séquençage de cet article, les auteurs ont utilisé le pipeline DADA2. Contrairement aux méthodes traditionnelles basées sur les OTU (Unités Taxonomiques Opérationnelles), DADA2 permet de modéliser les erreurs de séquençage pour corriger les lectures et produire des ASV (Amplicons Sequence Variants). Le processus inclut le filtrage de qualité, la déduplication, la fusion des lectures “paired-end” et la suppression des chimères.
+</p>
+
+<span class="section-title">1-PREPARATION</span>
+<p>1-a) Il faut installer le package DADA2 afin de travailler sur les données de l’article:</p>
+
+<pre><code>library(dada2); packageVersion("dada2")</code></pre>
+<p>[1] ‘1.28.0’</p>
+
+<pre><code><span class="comment"># Définir le chemin vers le dossier contenant les fichiers FASTQ après décompression.</span>
+path <- "~/Article_ADM" 
+
+<span class="comment"># Liste tous les fichiers présents dans ce dossier pour vérifier que les FASTQ sont présent.</span>
+list.files(path)</code></pre>
+
+<p>[1] “ena-file-download-read_run-PRJNA489752-fastq_ftp-20260112-1450.sh”<br>
+[2] “SraRunTable.csv”</p>
+
+<p>1-b)Téléchargement des métadonnées.</p>
+<pre><code>library(readr)
+metadata <- read_csv("~/Article_ADM/SraRunTable.csv")</code></pre>
+
+<p>1-c)Assignation du chemin.</p>
+<pre><code>path <- "~/Article_ADM"
+fnFs <- sort(list.files(path, pattern="_1.fastq", full.names = TRUE))
+
+<span class="comment"># Récupérer et trier tous les fichiers FASTQ reverse.</span>
+fnRs <- sort(list.files(path, pattern="_2.fastq", full.names = TRUE))
+
+<span class="comment"># Extraire les noms d'échantillons à partir des fichiers forward.</span>
+sample.names <- sapply(strsplit(basename(fnFs), "_"), `[`, 1)</code></pre>
+
+<span class="section-title">2-Inspecter les profils de qualité de lecture</span>
+<pre><code>plotQualityProfile(fnFs[1:2])</code></pre>
+<img src="./000010.png" alt="Qualité Forward">
+<p>Les profils Forward révèlent un séquençage de haute qualité (Q>30), malgré une baisse de la précision en fin de lecture au-delà de 230 pb.</p>
+
+<pre><code>plotQualityProfile(fnRs[1:2])</code></pre>
+<img src="./000010%20(1).png" alt="Qualité Reverse">
+<p>Les reads “reverse” sont de moins bonne qualité en moyenne. On note une baisse de précision au-delà de 230 pb.</p>
+
+<span class="section-title">3-FILTRER ET DECOUPER</span>
+<pre><code><span class="comment"># Définir le chemin des fichiers filtrés</span>
+filtFs <- file.path(path, "filtered", paste0(sample.names, "_F_filt.fastq.gz"))
+filtRs <- file.path(path, "filtered", paste0(sample.names, "_R_filt.fastq.gz"))
+
+names(filtFs) <- sample.names
+names(filtRs) <- sample.names
+
+<span class="comment"># Filtrer et tronquer les fichiers</span>
+out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs, truncLen=c(240,160),
+                     maxN=0, maxEE=c(2,2), truncQ=2, rm.phix=TRUE,
+                     compress=TRUE, multithread=FALSE)  
+
+head(out)</code></pre>
+
+<span class="section-title">4-APPRENTISSAGE DU TAUX D’ERREUR</span>
+<pre><code><span class="comment"># Apprentissage des profils d'erreurs forward</span>
+errF <- learnErrors(filtFs, multithread=FALSE)
+<span class="comment"># Apprentissage des profils d'erreurs reverse</span>
+errR <- learnErrors(filtRs, multithread=FALSE)
+
+plotErrors(errF, nominalQ=TRUE)</code></pre>
+<img src="./000010%20(2).png" alt="Plot Error">
+
+<span class="section-title">5-INFERENCE DES ECHANTILLONS</span>
+<pre><code><span class="comment"># Application de l'algorithme DADA</span>
+dadaFs <- dada(filtFs, err=errF, multithread=TRUE)
+dadaRs <- dada(filtRs, err=errR, multithread=TRUE)</code></pre>
+
+<span class="section-title">6-FUSION DES LECTURES</span>
+<pre><code><span class="comment"># Fusionner les lectures forward et reverse</span>
+mergers <- mergePairs(dadaFs, filtFs, dadaRs, filtRs, verbose=TRUE)</code></pre>
+
+<span class="section-title">7-CONSTRUCTION DE LA TABLE DE SEQUENCES</span>
+<pre><code>seqtab <- makeSequenceTable(mergers)
+dim(seqtab)
+<span class="comment"># Distribution des longueurs</span>
+table(nchar(getSequences(seqtab)))</code></pre>
+
+<span class="section-title">8-Suppression des chimères</span>
+<pre><code><span class="comment"># Supprimer les séquences chimériques</span>
+seqtab.nochim <- removeBimeraDenovo(seqtab, method="consensus", multithread=TRUE, verbose=TRUE)
+dim(seqtab.nochim)</code></pre>
+
+<span class="section-title">9-SUIVI DU PIPELINE</span>
+<pre><code>sum(seqtab.nochim)/sum(seqtab)
+
+getN <- function(x) sum(getUniques(x))
+track <- cbind(out, sapply(dadaFs, getN), sapply(dadaRs, getN), sapply(mergers, getN), rowSums(seqtab.nochim))
+colnames(track) <- c("input", "filtered", "denoisedF", "denoisedR", "merged", "nonchim")
+rownames(track) <- sample.names
+head(track)</code></pre>
+
+<span class="section-title">10-ATTRIBUER UNE TAXONOMIE</span>
+<pre><code><span class="comment"># Assigne la taxonomie avec la base SILVA</span>
+taxa <- assignTaxonomy(seqtab.nochim, "silva_nr99_v138.2_toGenus_trainsetw.fa.gz", multithread=FALSE)
+taxa.print <- taxa
+rownames(taxa.print) <- NULL
+head(taxa.print)</code></pre>
+
+<span class="section-title">RESULTATS</span>
+<pre><code>library(phyloseq)
+library(Biostrings)
+library(ggpubr)
+theme_set(theme_bw())
+
+ps <- phyloseq(
+  otu_table(seqtab.nochim, taxa_are_rows=FALSE), 
+  sample_data(metadata),                         
+  tax_table(taxa)                                
+)</code></pre>
+
+<img src="./000012.png" alt="Shannon Index">
+<p>
+    L’analyse de la diversité alpha révèle que le microbiome sanguin présente les niveaux de richesse les plus élevés (indice entre 8 et 9). Cette diversité est statistiquement significative par rapport aux autres sites.
+</p>
+
+<img src="./000019.png" alt="Beta Diversité">
+<p>
+    L’analyse de la bêta-diversité montre deux regroupements distincts : le microbiome du sang forme un groupe isolé, tandis que les échantillons buccaux se regroupent par similitude écologique.
+</p>
+
+<img src="./000010%20(3).png" alt="Taxonomie">
+<p>
+    Le microbiome sanguin et buccal est dominé par les Pseudomonadota, tandis que les selles sont dominées par les Bacteroidota et les Bacillota.
+</p>
+
+<span class="section-title">DISCUSSION</span>
+<p>
+    Nos résultats confirment les conclusions de l’article, notamment sur la haute diversité du microbiome sanguin. L’absence de données pour la plaque dentaire suggère des paramètres de filtrage possiblement trop sévères lors de la raréfaction. La séparation nette en bêta-diversité confirme que chaque zone corporelle possède sa propre signature microbienne.
+</p>
+
+<span class="section-title">CONCLUSION</span>
+<p>
+    Cette étude démontre que le corps humain est un archipel de niches écologiques spécialisées. Le microbiome systémique s'avère être un indicateur précieux de l'état de santé parodontale et générale.
+</p>
+
+</body>
+</html>
