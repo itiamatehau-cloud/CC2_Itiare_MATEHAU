@@ -7,24 +7,24 @@ output:
   html_document: default
 date: "2026-01-12"
 ---
-#INTRODUCTION
+# INTRODUCTION
 
 Cette étude, intitulée "Metagenomic characterization of the microbiomes in five different body habitats of otherwise healthy individuals with periodontal disease", a été publiée le 13 septembre 2023 dans la revue Frontiers in Cellular and Infection Microbiology. Les auteurs principaux sont Sujin Oh, Hyo-Jung Lee et Kyoung Un Park, issus de l'Université Nationale de Séoul.
 Il porte sur la caractérisation des profils microbiens (taxonomiques et fonctionnels )dans cinq habitats corporels différents chez des individus atteints de maladie parodontale mais par ailleurs en bonne santé. Cette recherche vise à étudier le microbiome buccal, du sang et du tube digestif et à comprendre comment leur altération peut contribuer à des maladies parodontale comme des maladie cardio-vasculaire, l’Alzheimer et du cancer, avant même l’apparition des premiers symptômes cliniques.
 Dans l’analyse effectuée avec le pipeline DADA2, l’objectif est de comparer la structure et la signature taxonomique des microbiomes systémiques.
 
 
-#MATERIELS ET METHODES
+# MATERIELS ET METHODES
 
 L'étude porte sur un échantillon de 10 adultes présentant une maladie parodontale. Des prélèvements ont été effectués dans cinq sites distincts, au niveau du sang, de la muqueuse buccale, de la plaque dentaire, de la salive ainsi que des selles. La méthode principale repose sur le séquençage du gène ARNr 16S via la plateforme MiSeq. L'analyse bioinformatique a utilisé QIIME2 pour la diversité et ANCOM-BC pour l'abondance différentielle.
 
-##DADA2
+## DADA2
 
 Pour analyser les données brutes de séquençage de cet article, les auteurs utilisé  le pipeline DADA2. Contrairement aux méthodes traditionnelles basées sur les OTU (Unités Taxonomiques Opérationnelles), DADA2 permet de modéliser les erreurs de séquençage pour corriger les lectures et produire des ASV (Amplicons Sequence Variants). Le processus inclut le filtrage de qualité, la déduplication, la fusion des lectures "paired-end" et la suppression des chimères.
 
 
-##1-PREPARATION
-###1-a) Il faut installer le package DADA2 afin de travailler sur les données de l'article:
+## 1-PREPARATION
+### 1-a) Il faut installer le package DADA2 afin de travailler sur les données de l'article:
 ```{r}
 library(dada2); packageVersion("dada2")
 ```
@@ -40,13 +40,13 @@ list.files(path)
 [1] "ena-file-download-read_run-PRJNA489752-fastq_ftp-20260112-1450.sh"
 [2] "SraRunTable.csv" 
 
-###1-b)Télécharement des métadonnées.
+### 1-b)Télécharement des métadonnées.
 ```{r}
 library(readr)
 metadata<- read_csv("~/Article_ADM/SraRunTable.csv")
 ```
 
-###1-c)Assignation du chemin, la commande list.files(path) permet de créer un vecteur contenant les noms des fichiers fastq.
+### 1-c)Assignation du chemin, la commande list.files(path) permet de créer un vecteur contenant les noms des fichiers fastq.
 ```{r}
 path <- "~/Article_ADM"
 fnFs <- sort(list.files(path, pattern="_1.fastq", full.names = TRUE))
@@ -59,7 +59,7 @@ fnRs <- sort(list.files(path, pattern="_2.fastq", full.names = TRUE))
 sample.names <- sapply(strsplit(basename(fnFs), "_"), `[`, 1)
 ```
 
-##2-Inspecter les profils de qualité de lecture
+## 2-Inspecter les profils de qualité de lecture
 ```{r}
 plotQualityProfile(fnFs[1:2])
 ```
@@ -74,7 +74,7 @@ plotQualityProfile(fnRs[1:2])
 
 La figure ci-dessus indique que les reads "reverse" sont de moins bonne qualité en moyenne que les reads "forward". Les profils Reverse révèlent, tout comme les profils Forward, un séquençage de haute qualité (Q>30) , malgré une baisse  de la précision aussi en fin de lecture au-delà de 230 pb.
 
-##3-FILTRER ET DECOUPER
+## 3-FILTRER ET DECOUPER
 ```{r}
 # Définir le chemin et le nom des fichiers forward filtrés
 # Les fichiers filtrés seront placés dans le sous-dossier "filtered" avec le suffixe "_F_filt.fastq.gz".
@@ -105,7 +105,7 @@ SRR7820327_1.fastq.gz   171871    146349
 SRR7820328_1.fastq.gz   167836    145566
 SRR7820329_1.fastq.gz   174471    152123
 
-##4-APPRENTISSAGE DU TAUX D'ERREUR
+## 4-APPRENTISSAGE DU TAUX D'ERREUR
 ```{r}
 # Cette commande apprend les profils d'erreurs à partir des fichiers forward filtrés pour modéliser la probabilité d'erreurs de séquençage, en utilisant le multithreading pour accélérer le calcul.
 errF <- learnErrors(filtFs, multithread=FALSE)
@@ -124,7 +124,7 @@ plotErrors(errF, nominalQ=TRUE)
 ```
 ![Plot Error](./000010%20(2).png)
 
-##5-INTERFERENCE DES ECHANTILLIONS
+## 5-INTERFERENCE DES ECHANTILLIONS
 ```{r}
 # Appliquer l’algorithme DADA aux fichiers forward filtrés pour inférer les séquences exactes d’amplicons en corrigeant les erreurs de séquençage à partir du modèle d’erreurs appris.
 dadaFs <- dada(filtFs, err=errF, multithread=TRUE)
@@ -143,7 +143,7 @@ Key parameters: OMEGA_A = 1e-40, OMEGA_C = 1e-40, BAND_SIZE = 16
 dadaRs <- dada(filtRs, err=errR, multithread=TRUE)
 ```
 
-##6-FUSION DES LECTURES APPROPRIEES
+## 6-FUSION DES LECTURES APPROPRIEES
 ```{r}
 # Fusionner les lectures forward et reverse pour chaque échantillon en alignant les régions qui se chevauchent et en éliminant les paires incohérentes.
 mergers <- mergePairs(dadaFs, filtFs, dadaRs, filtRs, verbose=TRUE)
@@ -153,7 +153,7 @@ mergers <- mergePairs(dadaFs, filtFs, dadaRs, filtRs, verbose=TRUE)
 head(mergers[[1]])
 ```
 
-##7-CONSTRUCTION DE LA TABLE DE SEQUENCES
+## 7-CONSTRUCTION DE LA TABLE DE SEQUENCES
 ```{r}
 # Construire la table de séquences (Sequence Table) à partir des lectures fusionnées, où chaque ligne correspond à un échantillon et chaque colonne à une séquence unique.
 seqtab <- makeSequenceTable(mergers)
@@ -180,7 +180,7 @@ table(nchar(getSequences(seqtab)))
 388 
  11
 
-##8-Suspenssion des chimères
+## 8-Suspenssion des chimères
 ```{r}
 # Supprimer les séquences chimériques de la table à l’aide de la méthode de détection par consensus, en utilisant le multithreading pour accélérer le traitement.
 seqtab.nochim <- removeBimeraDenovo(seqtab, method="consensus", multithread=TRUE, verbose=TRUE)
@@ -193,7 +193,7 @@ dim(seqtab.nochim)
 ```
 [1]  50 694
 
-##9-SUIVI DU PIPELINE
+## 9-SUIVI DU PIPELINE
 ```{r}
 # Calcule la proportion de séquences non chimériques par rapport au total pour évaluer la qualité du jeu de données après détection des chimères
 sum(seqtab.nochim)/sum(seqtab)
@@ -217,7 +217,7 @@ SRR7820327 171871   146349    144955    145548     15      14
 SRR7820328 167836   145566    142073    144041      9       7
 SRR7820329 174471   152123    148933    150382     15      11
 
-##10-ATTRIBUER UNE TAXONOMIE
+## 10-ATTRIBUER UNE TAXONOMIE
 ```{r}
 # Assigne la taxonomie à chaque séquence non chimérique en utilisant la base SILVA v138, avec multithreading pour accélérer le traitement
 taxa <- assignTaxonomy(seqtab.nochim, "silva_nr99_v138.2_toGenus_trainsetw.fa.gz", multithread=FALSE)
@@ -236,8 +236,8 @@ Kingdom     Phylum Class Order Family Genus
 [5,] "Eukaryota" NA     NA    NA    NA     NA   
 [6,] "Eukaryota" NA     NA    NA    NA     NA 
 
-#RESULTATS
-##Handoff to phyloseq
+# RESULTATS
+## Handoff to phyloseq
 
 ```{r}
 library(phyloseq); packageVersion("phyloseq")
@@ -412,13 +412,13 @@ ggplot(df_plot, aes(x = Habitat, y = Abundance, fill = Phylum)) +
 
 Le microbiome sanguin, de la muqueuse et de la salive sont dominées par les Pseudomonadota . À l'opposé, les selles présentent une composition très spécialisée, massivement dominée par les Bacteroidota et les Bacillota (Firmicutes). L’habitat de la plaque dentaire conserve une identité propre avec une présence marquée de Bacteroidota. 
 
-#DISCUSSION
+# DISCUSSION
 
 En comparant l’analyses (issues de DADA2 et Phyloseq) avec les données de l'article, l’observation d’une dynamique intéressante entre la réalité biologique et les choix méthodologiques. L'article met en avant le microbiome sanguin comme étant le plus diversifié, l’indice de Shannon obtenu semble appuyer la même conclusion. Cependant, les valeurs absolues sont légèrement plus basses. Cependant, l'absence de données pour la plaque dentaire (notée NA) pourraient provenir de paramètres de filtrage trop sévères.Lors de l'étape de raréfaction dans Phyloseq ces échantillons n'ont probablement pas atteint le seuil minimum de lecture requis et ont été automatiquement écartés. 
 Sur le plan de la bêta-diversité, malgré l'absence de la plaque, nos résultats confirment la séparation nette observée dans l'article. Le sang, les selles et les tissus buccaux ne se mélangent pas ; ils forment des îles microbiennes distinctes. Cela prouve que chaque zone du corps impose ses propres règles environnementales aux bactéries qui s'y installent.
 Enfin, l’analyse taxonomique est très cohérente avec l'étude de référence. Cela confirme que les Pseudomonadota sont les piliers du microbiome sanguin et de la muqueuse, tandis que les Bacteroidota et les Bacillota (Firmicutes) règnent sur les selles. Cette stabilité dans les résultats, malgré des pipelines différents, renforce l'idée que ces phyla sont les véritables signatures biologiques de nos habitats corporels. 
 
-#CONCLUSION
+# CONCLUSION
 
 Cette étude a permis de confronter les profils microbiens de cinq habitats corporels chez des patients atteints de maladie parodontale. Le corps humain ne constitue pas un environnement uniforme, mais un archipel de niches écologiques hautement spécialisées.
 En définitive, ce travail renforce l'idée que le microbiome systémique est un indicateur précieux de l'état de santé.
